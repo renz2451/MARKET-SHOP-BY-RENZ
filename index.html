@@ -4,68 +4,66 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Market Shop — Drinks & Foods</title>
-  <meta name="description" content="Market shop with user profile (one-time edit) and Telegram checkout integration" />
+  <meta name="description" content="Market shop demo with profile, cart, Telegram checkout, order history and export" />
   <style>
-    :root{ --bg:#0b1220; --card:#0f1724; --muted:#9aa4b2; --accent:#ff7a59; --glass: rgba(255,255,255,0.03); --card-2:#0c1626 }
+    :root{ --bg:#0b1220; --card:#0f1724; --muted:#9aa4b2; --accent:#ff7a59; --accent-2:#7c3aed; --glass: rgba(255,255,255,0.03); --glass-2: rgba(255,255,255,0.02); }
     *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
     body{margin:0;min-height:100vh;background:linear-gradient(180deg,#071022 0%, #081428 60%);color:#e6eef8}
-    .app{max-width:1150px;margin:28px auto;padding:18px;display:grid;grid-template-columns:1fr 360px;gap:20px}
-    header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent)}
-    header .left{display:flex;align-items:center;gap:12px}
+    .wrap{max-width:1150px;margin:22px auto;display:grid;grid-template-columns:1fr 400px;gap:18px;padding:16px}
+    header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 6px 18px rgba(2,6,23,0.6)}
     header h1{margin:0;font-size:18px}
-    .search{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;width:360px}
-    .panel{background:linear-gradient(180deg,var(--card),var(--card-2));padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .panel{background:linear-gradient(180deg,var(--card),#0c1626);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .controls{display:flex;gap:8px;align-items:center}
+    .search{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
     .chips{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.02);cursor:pointer;font-weight:600}
-    .chip.active{background:linear-gradient(90deg,var(--accent),#7c3aed);color:white}
+    .chip{padding:8px 12px;border-radius:999px;background:var(--glass-2);cursor:pointer;font-size:14px}
+    .chip.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
-    .card{padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));display:flex;flex-direction:column;gap:8px}
-    .thumb{height:140px;border-radius:10px;background-size:cover;background-position:center}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:8px}
+    .img{height:140px;border-radius:10px;background-size:cover;background-position:center}
     .title{font-weight:700}
-    .meta{font-size:13px;color:var(--muted)}
-    .price{font-weight:800}
-    .btn{padding:8px 12px;border-radius:10px;border:none;background:var(--accent);color:white;cursor:pointer}
+    .price{font-weight:700}
+    .muted{color:var(--muted);font-size:13px}
+    .btn{padding:8px 10px;border-radius:10px;border:none;background:var(--accent);color:white;cursor:pointer}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
-    .cart{position:sticky;top:28px}
-    .cart .cart-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    .cart{position:sticky;top:22px}
+    .cart-item{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03)}
     .small{font-size:13px;color:var(--muted)}
-    .avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#2b6ce6,#7c3aed);font-weight:700}
-    /* modal */
-    .modal{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,0.55)}
-    .modal .box{width:100%;max-width:520px;background:#0b1220;padding:18px;border-radius:12px}
-    .field{display:flex;gap:8px;margin-top:8px}
-    .field input, select{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    input[type=number]{width:72px;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .empty{padding:18px;border-radius:10px;background:rgba(255,255,255,0.02);text-align:center;color:var(--muted)}
     footer{grid-column:1/-1;text-align:center;color:var(--muted);margin-top:12px}
-    @media (max-width:980px){ .app{grid-template-columns:1fr; padding:12px} .cart{position:relative;top:auto} .search{width:200px} }
+    /* modal */
+    .modal{position:fixed;inset:0;display:grid;place-items:center;background:rgba(2,6,23,0.6);z-index:60}
+    .modal-card{width:96%;max-width:720px;background:#0b1220;border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    .field{display:flex;flex-direction:column;margin-bottom:10px}
+    .field label{font-size:13px;color:var(--muted);margin-bottom:6px}
+    .input{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .history-list{max-height:380px;overflow:auto;margin-top:12px}
+    .history-item{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px}
+    @media (max-width:980px){ .wrap{grid-template-columns:1fr;padding:12px} .cart{position:relative;top:auto} .search{width:200px} }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="wrap">
     <header>
-      <div class="left">
-        <div class="avatar" id="avatar">U</div>
-        <div>
-          <h1>Market Shop</h1>
-          <div class="small" id="profileText">Loading profile...</div>
-        </div>
+      <div>
+        <h1>GARDEN OF EAT'N — WHERE FLAVORS GROW</h1>
+        <div class="small">Foods → Lunch / Snacks / Dessert</div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <input id="search" class="search" placeholder="Search products, lunch/snacks/dessert..." />
-        <button id="editProfileBtn" class="btn ghost">Edit Profile</button>
+      <div class="controls">
+        <input id="search" class="search" placeholder="Search products or categories..." />
+        <button id="openProfileBtn" class="btn btn-ghost">Profile</button>
+        <button id="openHistoryBtn" class="btn btn-ghost">📜 Order History</button>
       </div>
     </header>
 
     <main>
       <div class="panel">
-        <div style="display:flex;align-items:center;gap:12px;justify-content:space-between">
-          <div class="chips" id="categories">
-            <div class="chip active" data-cat="all">All</div>
-            <div class="chip" data-cat="drinks">Drinks</div>
-            <div class="chip" data-cat="foods">Foods</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <label class="small">Food type</label>
-            <select id="foodType" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
+          <div class="chips" id="categoryChips"></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="small">Filter foods:</div>
+            <select id="foodFilter" class="chip" style="padding:8px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit">
               <option value="all">All</option>
               <option value="Lunch">Lunch</option>
               <option value="Snacks">Snacks</option>
@@ -77,10 +75,11 @@
         <div id="productGrid" class="grid"></div>
       </div>
 
-      <div style="height:14px"></div>
+      <div style="height:12px"></div>
+
       <div class="panel">
-        <h3 style="margin:0">Product details</h3>
-        <div id="detail" style="margin-top:12px" class="small">Select a product to view details.</div>
+        <h3 style="margin:0">Product Details</h3>
+        <div id="detailArea" style="margin-top:12px">Select a product to see details.</div>
       </div>
     </main>
 
@@ -89,252 +88,292 @@
       <div id="cartList" style="margin-top:12px"></div>
       <div id="cartSummary" style="margin-top:12px"></div>
       <div style="margin-top:12px;display:flex;gap:8px">
-        <button id="checkoutBtn" class="btn">Order Now</button>
-        <button id="clearCartBtn" class="btn ghost">Clear</button>
+        <button id="checkoutBtn" class="btn">Checkout & Send to Telegram</button>
+        <button id="clearCartBtn" class="btn btn-ghost">Clear</button>
       </div>
-      <div style="margin-top:10px" class="small">Orders are sent to Telegram bot</div>
+      <div style="margin-top:10px" class="small">Orders are sent to Telegram bot & saved locally.</div>
     </aside>
 
-    <footer>Demo shop — Single file. Data saved in your browser.</footer>
+    <footer>Demo shop — hosted at your GitHub Pages. Data persists locally in your browser.</footer>
   </div>
 
-  <!-- Profile modal (one-time edit only) -->
+  <!-- Profile modal -->
   <div id="profileModal" class="modal" style="display:none">
-    <div class="box">
-      <h2>Profile (one-time edit)</h2>
-      <div class="field"><input id="ln" placeholder="Last name" /><input id="fn" placeholder="First name" /><input id="mn" placeholder="Middle name" /></div>
-      <div class="field"><input id="grade" placeholder="Grade (e.g. 12)" /><input id="section" placeholder="Section (e.g. BELL)" /></div>
-      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-        <button id="saveProfile" class="btn">Save</button>
-        <button id="cancelProfile" class="btn ghost">Cancel</button>
+    <div class="modal-card">
+      <h2 style="margin:0 0 10px 0">Your Profile (one-time edit)</h2>
+      <div class="field"><label>Last name</label><input id="last" class="input" /></div>
+      <div class="field"><label>First name</label><input id="first" class="input" /></div>
+      <div class="field"><label>Middle name</label><input id="middle" class="input" /></div>
+      <div class="field"><label>Grade level</label><select id="grade" class="input"></select></div>
+      <div class="field"><label>Section</label><select id="section" class="input"></select></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button id="saveProfileBtn" class="btn">Save</button>
+        <button id="closeProfileBtn" class="btn btn-ghost">Close</button>
       </div>
-      <div class="small" style="margin-top:8px;color:var(--muted)">You can edit this profile only <strong>once</strong>. After saving, further edits will be disabled.</div>
+      <div class="small" style="margin-top:10px">Note: Profile can be <strong>edited only once</strong>. After one edit it will be locked.</div>
     </div>
   </div>
 
-<script>
-// --- CONFIG (USER PROVIDED) ---
-const TELEGRAM_BOT_TOKEN = '8397045707:AAES7hNLynv3NiAiegUgEVZXoLC0R-Aaoak';
-const TELEGRAM_CHAT_ID  = '6064653643';
-// -------------------------------
+  <!-- History modal -->
+  <div id="historyModal" class="modal" style="display:none">
+    <div class="modal-card">
+      <h2 style="margin:0 0 10px 0">Order History</h2>
+      <div class="history-list" id="historyList"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="exportBtn" class="btn">⬇️ Export History</button>
+        <button id="clearHistoryBtn" class="btn btn-ghost">🗑️ Clear History</button>
+        <button id="closeHistoryBtn" class="btn btn-ghost">Close</button>
+      </div>
+    </div>
+  </div>
 
-// PRODUCTS
-const PRODUCTS = [
-  {id:'p1', title:'Waffle Solo', price:30, category:'foods', sub:'Snacks', img:'https://images.unsplash.com/photo-1604908176929-8f7a5b6e1f7e?auto=format&fit=crop&w=800&q=60', desc:'Crispy waffle.'},
-  {id:'p2', title:'Iced Coffee', price:60, category:'drinks', img:'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=800&q=60', desc:'Cold brewed coffee.'},
-  {id:'p3', title:'Chicken Rice', price:120, category:'foods', sub:'Lunch', img:'https://images.unsplash.com/photo-1604908176929-8f7a5b6e1f7e?auto=format&fit=crop&w=800&q=60', desc:'Grilled chicken with rice.'},
-  {id:'p4', title:'French Fries', price:80, category:'foods', sub:'Snacks', img:'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=60', desc:'Crispy fries.'},
-  {id:'p5', title:'Chocolate Cake', price:110, category:'foods', sub:'Dessert', img:'https://images.unsplash.com/photo-1601992964700-2f8d7d0a6a5c?auto=format&fit=crop&w=800&q=60', desc:'Rich chocolate cake.'}
-];
+  <script>
+    // ---------- CONFIG (USER) ----------
+    const TELEGRAM_TOKEN = '8397045707:AAES7hNLynv3NiAiegUgEVZXoLC0R-Aaoak';
+    const TELEGRAM_CHAT_ID = '6064653643';
+    const SHOP_BASE = 'https://renz2451.github.io/MARKET-SHOP-BY-RENZ/';
+    // ------------------------------------
 
-// STORAGE KEYS
-const KEY_PROFILE = 'market_profile_v1';
-const KEY_PROFILE_EDITS = 'market_profile_edits_v1';
-const KEY_CART = 'market_cart_v1';
+    // products
+    const PRODUCTS = [
+      { id:'waffle-solo', category:'foods', sub:'Snacks', title:'Waffle Solo', price:30, img:'https://images.unsplash.com/photo-1601992964700-2f8d7d0a6a5c?auto=format&fit=crop&w=800&q=60', desc:'Crispy waffle.' },
+      { id:'iced-coffee', category:'drinks', title:'Iced Coffee', price:60, img:'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=800&q=60', desc:'Cold brewed coffee.' },
+      { id:'chicken-rice', category:'foods', sub:'Lunch', title:'Chicken Rice', price:120, img:'https://raw.githubusercontent.com/renz2451/MARKET-SHOP-BY-RENZ/refs/heads/main/Products/Logo/logo.jpeg', desc:'Grilled chicken with rice.' },
+      { id:'french-fries', category:'foods', sub:'Snacks', title:'French Fries', price:80, img:'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=60', desc:'Crispy fries.' },
+      { id:'chocolate-cake', category:'foods', sub:'Dessert', title:'Chocolate Cake', price:110, img:'https://images.unsplash.com/photo-1601992964700-2f8d7d0a6a5c?auto=format&fit=crop&w=800&q=60', desc:'Rich chocolate cake.' },
+      { id:'ice-cream-scoop', category:'foods', sub:'Dessert', title:'Ice Cream Scoop', price:65, img:'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=800&q=60', desc:'Creamy vanilla ice cream.' },
+      { id:'mango-shake', category:'drinks', title:'Mango Shake', price:70, img:'https://images.unsplash.com/photo-1561043433-aaf687c4cf4b?auto=format&fit=crop&w=800&q=60', desc:'Creamy mango blended shake.' },
+      { id:'mineral-water', category:'drinks', title:'Mineral Water', price:25, img:'https://images.unsplash.com/photo-1505575967450-1b5f7d1f0cdf?auto=format&fit=crop&w=800&q=60', desc:'Refreshing bottled water.' }
+    ];
 
-// APP STATE
-let state = {
-  profile: load(KEY_PROFILE) || null,
-  profileEdits: load(KEY_PROFILE_EDITS) || 0,
-  cart: load(KEY_CART) || [],
-  category: 'all',
-  foodFilter: 'all',
-  search: ''
-};
+    // storage keys
+    const LS_CART = 'market_cart_v2';
+    const LS_PROFILE = 'market_profile_v2';
+    const LS_PROFILE_EDITS = 'market_profile_edits_v2';
+    const LS_ORDERS = 'market_orders_v2';
+    const LS_ORDER_SEQ = 'market_order_seq_v2'; // object mapping date->lastseq
 
-// DOM refs
-const productGrid = document.getElementById('productGrid');
-const cartList = document.getElementById('cartList');
-const cartSummary = document.getElementById('cartSummary');
-const detail = document.getElementById('detail');
-const avatar = document.getElementById('avatar');
-const profileText = document.getElementById('profileText');
-const profileModal = document.getElementById('profileModal');
-const lnI = document.getElementById('ln'), fnI = document.getElementById('fn'), mnI = document.getElementById('mn'), gradeI = document.getElementById('grade'), sectionI = document.getElementById('section');
-const editProfileBtn = document.getElementById('editProfileBtn');
+    // state
+    let cart = JSON.parse(localStorage.getItem(LS_CART) || '[]');
+    let profile = JSON.parse(localStorage.getItem(LS_PROFILE) || 'null');
+    let profileEdits = Number(localStorage.getItem(LS_PROFILE_EDITS) || 0);
+    let orders = JSON.parse(localStorage.getItem(LS_ORDERS) || '[]');
+    let orderSeq = JSON.parse(localStorage.getItem(LS_ORDER_SEQ) || '{}');
+    let activeCategory = 'all';
 
-// init
-render();
-attachEvents();
+    // dom refs
+    const grid = document.getElementById('productGrid');
+    const categoryChips = document.getElementById('categoryChips');
+    const foodFilter = document.getElementById('foodFilter');
+    const searchInput = document.getElementById('search');
+    const cartList = document.getElementById('cartList');
+    const cartSummary = document.getElementById('cartSummary');
+    const detailArea = document.getElementById('detailArea');
+    const profileModal = document.getElementById('profileModal');
+    const historyModal = document.getElementById('historyModal');
+    // ---------- Populate grade & section dropdowns ----------
+const gradeSelect = document.getElementById('grade');
+const sectionSelect = document.getElementById('section');
 
-function load(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-
-function attachEvents(){
-  // category chips
-  document.querySelectorAll('.chip').forEach(el=> el.addEventListener('click', ()=>{
-    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-    el.classList.add('active'); state.category = el.dataset.cat; renderProducts();
-  }));
-  document.getElementById('foodType').addEventListener('change', (e)=>{ state.foodFilter = e.target.value; renderProducts(); });
-  document.getElementById('search').addEventListener('input', debounce((e)=>{ state.search = e.target.value; renderProducts(); },200));
-
-  document.getElementById('saveProfile').addEventListener('click', ()=>{
-    const ln = lnI.value.trim(), fn = fnI.value.trim(), mn = mnI.value.trim(), gr = gradeI.value.trim(), sec = sectionI.value.trim();
-    if(!ln || !fn || !gr || !sec){ alert('Please fill Last, First, Grade, and Section'); return; }
-    const formatted = `${ln}, ${fn}${mn? ' ' + mn : ''}`;
-    state.profile = { last:ln, first:fn, middle:mn, formatted, grade:gr, section:sec };
-    state.profileEdits = (state.profileEdits||0) + 1; // counts as one edit
-    save(KEY_PROFILE, state.profile); save(KEY_PROFILE_EDITS, state.profileEdits);
-    profileModal.style.display = 'none';
-    renderProfile();
-  });
-  document.getElementById('cancelProfile').addEventListener('click', ()=>{
-    if(!state.profile) { alert('Profile required to continue'); return; }
-    profileModal.style.display = 'none';
-  });
-
-  editProfileBtn.addEventListener('click', ()=>{
-    if(!state.profile) { openProfileModal(); return; }
-    if((state.profileEdits||0) >= 1){ alert('Profile edit already used.'); return; }
-    // allow one-time edit: prefill and show modal
-    lnI.value = state.profile.last||''; fnI.value = state.profile.first||''; mnI.value = state.profile.middle||''; gradeI.value = state.profile.grade||''; sectionI.value = state.profile.section||'';
-    profileModal.style.display = 'grid';
-  });
-
-  document.getElementById('clearCartBtn').addEventListener('click', ()=>{ if(confirm('Clear cart?')){ state.cart=[]; save(KEY_CART,state.cart); renderCart(); } });
-  document.getElementById('checkoutBtn').addEventListener('click', onCheckout);
+// Grades 7 to 12
+for (let g = 7; g <= 12; g++) {
+    let opt = document.createElement('option');
+    opt.value = g;
+    opt.textContent = 'Grade ' + g;
+    gradeSelect.appendChild(opt);
 }
 
-function openProfileModal(){
-  lnI.value=''; fnI.value=''; mnI.value=''; gradeI.value=''; sectionI.value='';
-  profileModal.style.display = 'grid';
+// Sections A to F
+['A','B','C','D','E','F'].forEach(s => {
+    let opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    sectionSelect.appendChild(opt);
+});
+
+// Fill dropdowns if profile exists
+function fillProfileInputs(){
+    if(!profile) return;
+    document.getElementById('last').value = profile.last || '';
+    document.getElementById('first').value = profile.first || '';
+    document.getElementById('middle').value = profile.middle || '';
+    if(profile.grade) gradeSelect.value = profile.grade;
+    if(profile.section) sectionSelect.value = profile.section;
 }
 
-function render(){
-  // if no profile, force modal
-  if(!state.profile){ openProfileModal(); } else { renderProfile(); }
-  renderProducts(); renderCart();
-}
 
-function renderProfile(){
-  const p = state.profile;
-  if(!p){ profileText.textContent = 'No profile set'; avatar.textContent = 'U'; return; }
-  profileText.textContent = `${p.formatted} • Grade ${p.grade} - ${p.section}`;
-  avatar.textContent = initials(p.formatted);
-}
+    // init
+    renderChips(); renderProducts(); renderCart(); updateProfileDisplay(); updateProfileInputs();
+    if(!profile) setTimeout(()=> openProfileModal(), 500);
 
-function initials(name){ return name.split(/[, ]+/).filter(Boolean).map(s=>s[0].toUpperCase()).slice(0,2).join('') || 'U'; }
+    // ---------- UI renderers ----------
+    function renderChips(){ const cats=['all','drinks','foods']; categoryChips.innerHTML=''; cats.forEach(c=>{ const el = document.createElement('div'); el.className='chip' + (c===activeCategory?' active':''); el.textContent = c==='all'? 'All' : (c==='foods'?'Foods': capitalize(c)); el.addEventListener('click', ()=>{ activeCategory=c; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); el.classList.add('active'); renderProducts(); }); categoryChips.appendChild(el); }); }
+    function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
-function renderProducts(){
-  productGrid.innerHTML='';
-  const q = (state.search||'').toLowerCase().trim();
-  const filtered = PRODUCTS.filter(p=>{
-    if(state.category !== 'all' && state.category === 'drinks' && p.category !== 'drinks') return false;
-    if(state.category === 'foods' && p.category !== 'foods') return false;
-    if(state.foodFilter && state.foodFilter !== 'all' && p.sub && p.sub !== state.foodFilter) return false;
-    // check q
-    const hay = (p.title + ' ' + (p.desc||'') + ' ' + (p.sub||'') + ' ' + p.category).toLowerCase();
-    if(q && !hay.includes(q)) return false;
-    return true;
-  });
-  if(filtered.length === 0){ productGrid.innerHTML = '<div class="small">No products</div>'; return; }
-  filtered.forEach(p=>{
-    const card = document.createElement('div'); card.className='card';
-    const t = document.createElement('div'); t.className='thumb'; t.style.backgroundImage = `url(${p.img})`;
-    const title = document.createElement('div'); title.className='title'; title.textContent = p.title;
-    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${p.category}${p.sub ? ' • ' + p.sub : ''}`;
-    const bottom = document.createElement('div'); bottom.style.display='flex'; bottom.style.justifyContent='space-between'; bottom.style.alignItems='center';
-    const price = document.createElement('div'); price.className='price'; price.textContent = '₱' + Number(p.price).toFixed(2);
-    const add = document.createElement('button'); add.className='btn'; add.textContent='Add'; add.onclick = (e)=>{ e.stopPropagation(); addToCart(p.id); };
-    bottom.appendChild(price); bottom.appendChild(add);
-    card.appendChild(t); card.appendChild(title); card.appendChild(meta); card.appendChild(bottom);
-    card.onclick = ()=> showDetail(p.id);
-    productGrid.appendChild(card);
-  });
-}
+    function renderProducts(){ const q=(searchInput.value||'').toLowerCase().trim(); const foodSel=foodFilter.value; grid.innerHTML=''; const filtered = PRODUCTS.filter(p=>{
+      if(activeCategory!=='all'){ if(activeCategory==='drinks' && p.category!=='drinks') return false; if(activeCategory==='foods' && p.category!=='foods') return false; }
+      if(p.category==='foods' && foodSel!=='all' && p.sub!==foodSel) return false; const hay = (p.title+' '+(p.desc||'')+' '+(p.sub||'')+' '+p.category).toLowerCase(); if(q && !hay.includes(q)) return false; return true; });
+      if(filtered.length===0){ grid.innerHTML = '<div class="empty">No products found</div>'; return; }
+      filtered.forEach(p=>{ const card=document.createElement('div'); card.className='card'; const img=document.createElement('div'); img.className='img'; img.style.backgroundImage=`url(${p.img})`; img.id = 'prod-'+p.id; const title=document.createElement('div'); title.className='title'; title.textContent=p.title; const meta=document.createElement('div'); meta.className='muted'; meta.textContent = `${p.category}${p.sub? ' • ' + p.sub : ''}`; const bottom=document.createElement('div'); bottom.style.display='flex'; bottom.style.justifyContent='space-between'; bottom.style.alignItems='center'; const price=document.createElement('div'); price.className='price'; price.textContent='₱'+Number(p.price).toFixed(2); const add=document.createElement('button'); add.className='btn'; add.textContent='Add'; add.addEventListener('click',(ev)=>{ ev.stopPropagation(); addToCart(p.id); }); bottom.appendChild(price); bottom.appendChild(add); card.appendChild(img); card.appendChild(title); card.appendChild(meta); card.appendChild(bottom); card.addEventListener('click',()=> showDetail(p.id)); grid.appendChild(card); }); }
 
-function showDetail(id){
-  const p = PRODUCTS.find(x=>x.id===id); if(!p) return; detail.innerHTML = `
-    <div style=\"display:flex;gap:12px;align-items:flex-start\">\n      <div style=\"width:180px;height:120px;border-radius:10px;background-image:url('${p.img}');background-size:cover;background-position:center\"></div>\n      <div>\n        <div style=\"font-weight:800;font-size:16px\">${p.title}</div>\n        <div class=\"small\">${p.category}${p.sub? ' • ' + p.sub : ''}</div>\n        <div style=\"margin-top:8px\">${p.desc||''}</div>\n        <div style=\"margin-top:12px;display:flex;gap:8px;align-items:center\">\n          <div style=\"font-weight:800\">₱${Number(p.price).toFixed(2)}</div>\n          <button class=\"btn\" onclick=\"addToCart('${p.id}')\">Add to cart</button>\n        </div>\n      </div>\n    </div>`;
-}
+    function showDetail(id){ const p = PRODUCTS.find(x=>x.id===id); if(!p) return; detailArea.innerHTML = `<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:180px;height:120px;border-radius:10px;background-image:url('${p.img}');background-size:cover;background-position:center"></div><div><div style="font-weight:800;font-size:16px">${p.title}</div><div class="small">${p.category}${p.sub? ' • ' + p.sub : ''}</div><div style="margin-top:8px">${p.desc||''}</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center"><div style="font-weight:800">₱${Number(p.price).toFixed(2)}</div><button class="btn" onclick="addToCart('${p.id}')">Add to cart</button></div></div></div>`; }
 
-function addToCart(id){
-  const p = PRODUCTS.find(x=>x.id===id); if(!p) return;
-  const found = state.cart.find(c=>c.id===id);
-  if(found){ found.qty += 1; } else { state.cart.push({ id:p.id, title:p.title, price:p.price, qty:1, img:p.img }); }
-  save(KEY_CART, state.cart); renderCart();
-}
+    // ---------- CART ----------
+    function addToCart(id){ const p = PRODUCTS.find(x=>x.id===id); if(!p) return; const ex = cart.find(c=>c.id===id); if(ex){ ex.qty += 1; } else { cart.push({ id:p.id, title:p.title, price:Number(p.price), qty:1, img:p.img }); } saveCart(); renderCart(); }
+    function saveCart(){ localStorage.setItem(LS_CART, JSON.stringify(cart)); }
+    function renderCart(){ cartList.innerHTML=''; if(cart.length===0){ cartList.innerHTML = '<div class="empty">Cart is empty</div>'; cartSummary.innerHTML=''; return; } let total=0; cart.forEach((it,idx)=>{ const row=document.createElement('div'); row.className='cart-item'; const left=document.createElement('div'); left.style.flex='1'; left.innerHTML = `<div style="font-weight:700">${it.title}</div><div class=\"small\">₱${Number(it.price).toFixed(2)} each</div>`; const right=document.createElement('div'); right.style.minWidth='140px'; right.style.display='flex'; right.style.alignItems='center'; right.style.justifyContent='flex-end'; const qty=document.createElement('input'); qty.type='number'; qty.value=it.qty; qty.min=1; qty.addEventListener('change',(e)=>{ it.qty = Math.max(1, Number(e.target.value)||1); saveCart(); renderCart(); }); const del=document.createElement('button'); del.className='btn btn-ghost'; del.textContent='Remove'; del.style.marginLeft='8px'; del.addEventListener('click',()=>{ cart.splice(idx,1); saveCart(); renderCart(); }); right.appendChild(qty); right.appendChild(del); row.appendChild(left); row.appendChild(right); cartList.appendChild(row); total += it.price * it.qty; }); cartSummary.innerHTML = `<div style="display:flex;justify-content:space-between"><div class=\"small\">Items: ${cart.length}</div><div style=\"font-weight:800\">Total: ₱${total.toFixed(2)}</div></div>`; }
 
-function updateQty(i, v){ state.cart[i].qty = Math.max(1, Number(v)||1); save(KEY_CART,state.cart); renderCart(); }
-function removeFromCart(i){ state.cart.splice(i,1); save(KEY_CART,state.cart); renderCart(); }
+    // ---------- PROFILE ----------
+    function openProfileModal(){ profileModal.style.display = 'grid'; fillProfileInputs(); updateProfileInputs(); }
+    function closeProfileModal(){ profileModal.style.display = 'none'; }
+    function fillProfileInputs(){ if(!profile) return; document.getElementById('last').value = profile.last || ''; document.getElementById('first').value = profile.first || ''; document.getElementById('middle').value = profile.middle || ''; document.getElementById('grade').value = profile.grade || ''; document.getElementById('section').value = profile.section || ''; }
+    function updateProfileInputs(){ const locked = profile && profile.locked && profileEdits >= 1; document.getElementById('last').disabled = locked; document.getElementById('first').disabled = locked; document.getElementById('middle').disabled = locked; document.getElementById('grade').disabled = locked; document.getElementById('section').disabled = locked; document.getElementById('saveProfileBtn').disabled = locked; }
+    function saveProfile(){ const last = document.getElementById('last').value.trim(); const first = document.getElementById('first').value.trim(); const middle = document.getElementById('middle').value.trim(); const grade = document.getElementById('grade').value.trim(); const sectionVal = document.getElementById('section').value.trim().toUpperCase(); if(!last||!first||!grade||!sectionVal){ alert('Please fill Last, First, Grade, and Section'); return; }
+      const isNew = !profile; if(isNew){ profileEdits = 0; }
+      if(profile && profile.locked && profileEdits >= 1){ alert('Profile already locked after one edit.'); closeProfileModal(); return; }
+      profile = { last, first, middle, grade, section: sectionVal, locked: profile ? profile.locked : false, formatted: `${last}, ${first}${middle? ' ' + middle : ''}` };
+      if(!isNew){ profileEdits = (profileEdits||0) + 1; if(profileEdits >= 1) profile.locked = true; }
+      localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); localStorage.setItem(LS_PROFILE_EDITS, String(profileEdits)); updateProfileDisplay(); updateProfileInputs(); closeProfileModal(); alert('Profile saved. You can edit only once.'); }
 
-function renderCart(){
-  cartList.innerHTML='';
-  if(state.cart.length === 0){ cartList.innerHTML = '<div class="small">Cart is empty</div>'; cartSummary.innerHTML=''; return; }
-  let total = 0;
-  state.cart.forEach((it, idx)=>{
-    const row = document.createElement('div'); row.className='cart-item';
-    const left = document.createElement('div'); left.innerHTML = `<div style="font-weight:700">${it.title}</div><div class=\"small\">₱${Number(it.price).toFixed(2)} each</div>`;
-    const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
-    const qty = document.createElement('input'); qty.type='number'; qty.value = it.qty; qty.min=1; qty.style.width='64px'; qty.onchange = (e)=> updateQty(idx, e.target.value);
-    const del = document.createElement('button'); del.className='btn ghost'; del.textContent='Remove'; del.onclick = ()=> removeFromCart(idx);
-    right.appendChild(qty); right.appendChild(del);
-    row.appendChild(left); row.appendChild(right);
-    cartList.appendChild(row);
-    total += it.price * it.qty;
-  });
-  cartSummary.innerHTML = `<div style="display:flex;justify-content:space-between"><div class=\"small\">Items: ${state.cart.length}</div><div style=\"font-weight:800\">Total: ₱${total.toFixed(2)}</div></div>`;
-}
+    function updateProfileDisplay(){ const btn = document.getElementById('openProfileBtn'); if(profile){ btn.textContent = `${profile.formatted} • ${profile.grade} - ${profile.section}`; } else { btn.textContent = 'Set profile'; } }
 
-// Checkout -> send to Telegram
-async function onCheckout(){
-  if(!state.profile){ alert('Please set your profile first'); openProfileModal(); return; }
-  if((state.cart||[]).length === 0){ alert('Cart is empty'); return; }
+    // ---------- ORDER ID, TIME ----------
+    function todayDateKey(){ const d = new Date(); const yyyy = d.getUTCFullYear(); const mm = String(d.getUTCMonth()+1).padStart(2,'0'); const dd = String(d.getUTCDate()).padStart(2,'0'); // use UTC then convert? We'll compute PH time separately
+      return `${yyyy}${mm}${dd}`; }
 
-  // build order text
-  let total = 0;
-  const lines = state.cart.map(it=>{ const line = `- ${it.title} x${it.qty} = ₱${(it.price*it.qty).toFixed(2)}`; total += it.price*it.qty; return line; });
-  const header = `My Order:\n\nName: ${state.profile.formatted}\nGrade/Section: ${state.profile.grade} - ${state.profile.section}\n\n`;
-  const body = lines.join('\n') + `\n\nTotal: ₱${total.toFixed(2)}`;
-  const textMessage = header + body;
+    function getPhilippinesNow(){ // returns Date in GMT+8
+      const now = new Date(); // user's local time; adjust to UTC then add 8 hours
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const ph = new Date(utc + (3600000 * 8));
+      return ph; }
 
-  // Show a quick confirmation UI (user sees the summary before sending)
-  if(!confirm('Send order to Telegram?\n\n' + body.replace(/\n/g,'\n'))){ return; }
+    function formatPHDate(d){ const yyyy = d.getFullYear(); const mm = String(d.getMonth()+1).padStart(2,'0'); const dd = String(d.getDate()).padStart(2,'0'); const hh = String(d.getHours()).padStart(2,'0'); const min = String(d.getMinutes()).padStart(2,'0'); return `${yyyy}-${mm}-${dd} ${hh}:${min}`; }
 
-  // attempt to send as message first
-  try{
-    const sendMsgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    const resp = await fetch(sendMsgUrl, {
-      method:'POST', headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: textMessage })
-    });
-    const j = await resp.json();
-    if(j && j.ok){
-      // try to send photos as media group (photos are remote URLs) — best-effort
+    function nextOrderId(){ const ph = getPhilippinesNow(); const dateKey = `${ph.getFullYear()}${String(ph.getMonth()+1).padStart(2,'0')}${String(ph.getDate()).padStart(2,'0')}`; let seqMap = JSON.parse(localStorage.getItem(LS_ORDER_SEQ) || '{}'); let n = Number(seqMap[dateKey] || 0) + 1; seqMap[dateKey] = n; localStorage.setItem(LS_ORDER_SEQ, JSON.stringify(seqMap)); const idx = String(n).padStart(3,'0'); return `ORD-${dateKey}-${idx}`; }
+
+    // ---------- TELEGRAM SENDING ----------
+    async function sendOrderToTelegram(order){
+      // order: { id, profile, items, total, timestampISO }
+      // 1) send first photo with header (order id, profile, grade link) as caption (HTML)
+      // 2) send remaining product photos with captions
+      // 3) send final summary message with order details and Visit Shop link
+
+      // build profile and grade link
+      const nameHtml = escapeHtml(`${order.profile.last}, ${order.profile.first}${order.profile.middle? ' ' + order.profile.middle : ''}`);
+      const gradeHtml = `<a href=\"${SHOP_BASE}#grade-${slugify(order.profile.grade)}-${slugify(order.profile.section)}\">${escapeHtml(order.profile.grade)} - ${escapeHtml(order.profile.section)}</a>`;
+
+      // send photos
+      if(order.items && order.items.length > 0){
+        // first item caption includes Order ID and profile
+        const first = order.items[0];
+        const firstCaption = `🛒 Order ID: <a href=\"${SHOP_BASE}orders/${order.id}\">${order.id}</a>\n👤 ${nameHtml} | 🎓 ${gradeHtml}\n\n${emojiFor(first.title)} ${escapeHtml(first.title)} x${first.qty} = ₱${(first.price*first.qty).toFixed(2)}\n<a href=\"${SHOP_BASE}#${first.id}\">🔗 View in Shop</a>`;
+        try{
+          await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
+            method:'POST', headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, photo: first.img, caption: firstCaption, parse_mode: 'HTML' })
+          });
+        }catch(e){ console.warn('sendPhoto failed (first)', e); throw e; }
+
+        // remaining items
+        for(let i=1;i<order.items.length;i++){
+          const it = order.items[i];
+          const caption = `${emojiFor(it.title)} ${escapeHtml(it.title)} x${it.qty} = ₱${(it.price*it.qty).toFixed(2)}\n<a href=\"${SHOP_BASE}#${it.id}\">🔗 View in Shop</a>`;
+          try{
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
+              method:'POST', headers:{ 'Content-Type':'application/json' },
+              body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, photo: it.img, caption, parse_mode: 'HTML' })
+            });
+          }catch(e){ console.warn('sendPhoto failed (item)', it, e); /* continue sending others */ }
+        }
+      }
+
+      // send final summary
+      const lines = order.items.map(it=> `- ${it.title} x${it.qty} = ₱${(it.price*it.qty).toFixed(2)}` ).join('\n');
+      const visitLink = `<a href=\"${SHOP_BASE}\">Visit Shop</a>`;
+      const ph = new Date(order.timestampISO);
+      const summary = `🛒 Order ID: <a href=\"${SHOP_BASE}orders/${order.id}\">${order.id}</a>\n🛒 Order from: ${nameHtml}\n🎓 Grade/Section: ${gradeHtml}\n🕒 Date/Time: ${formatPHDate(ph)} (GMT+8)\n\n📦 Items:\n${lines}\n\n💰 Total: ₱${order.total.toFixed(2)}\n\n🔗 ${visitLink}`;
       try{
-        const media = state.cart.map(it=>({ type:'photo', media: it.img, caption:`${it.title} x${it.qty}` }));
-        const mgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMediaGroup`;
-        const mgResp = await fetch(mgUrl, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, media }) });
-        const mgJson = await mgResp.json();
-        // mgJson may fail due to CORS or Telegram restrictions, but we ignore — it's best-effort
-      }catch(e){ console.warn('sendMediaGroup failed (best-effort):', e); }
-
-      alert('Order sent successfully!');
-      // clear cart after success
-      state.cart = []; save(KEY_CART, state.cart); renderCart();
-      return;
-    } else {
-      throw new Error('Telegram API sendMessage failed');
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+          method:'POST', headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: summary, parse_mode: 'HTML' })
+        });
+      }catch(e){ console.warn('sendMessage failed', e); throw e; }
     }
-  }catch(err){
-    console.warn('Telegram send failed', err);
-    // fallback: copy summary to clipboard and open t.me link for manual send
-    try{ await navigator.clipboard.writeText(textMessage); }catch(e){}
-    const fallback = confirm('Failed to send order directly due to browser restrictions (CORS/network).\nWe copied the order text to your clipboard.\n\nPress OK to open Telegram web to paste and send manually.');
-    if(fallback){
-      // open Telegram web chat with bot — cannot prefill message to bot chat, so open bot link instead
-      window.open(`https://t.me/${TELEGRAM_CHAT_ID}`, '_blank');
-    }
-  }
-}
 
-// Utilities
-function debounce(fn, wait=150){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }; }
+    function emojiFor(title){ // simple mapping
+      const t = title.toLowerCase(); if(t.includes('waffle')||t.includes('cake')||t.includes('ice cream')) return '🥞'; if(t.includes('burger')||t.includes('beef')) return '🍔'; if(t.includes('coffee')||t.includes('iced')) return '🥤'; if(t.includes('fries')) return '🍟'; return '📦'; }
 
-// initial load helpers
-renderProfile(); renderProducts(); renderCart();
+    function escapeHtml(s){ if(!s) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+    function slugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 
-</script>
+    // ---------- CHECKOUT FLOW ----------
+    document.getElementById('checkoutBtn').addEventListener('click', async ()=>{
+      if(cart.length === 0){ alert('Cart is empty'); return; }
+      if(!profile){ alert('Please set your profile first'); openProfileModal(); return; }
+      // build order
+      const id = nextOrderId(); const ph = getPhilippinesNow(); const timestampISO = ph.toISOString(); let total = 0; const items = cart.map(c=>{ total += c.price * c.qty; return { id:c.id, title:c.title, price:c.price, qty:c.qty, img:c.img }; });
+      const order = { id, profile, items, total, timestampISO };
+      if(!confirm(`Confirm order?\nTotal: ₱${total.toFixed(2)}\nOrder ID: ${id}`)) return;
+      // send
+      checkoutBtn.disabled = true; checkoutBtn.textContent = 'Sending...';
+      try{
+        await sendOrderToTelegram(order);
+        // save order locally
+        orders.unshift(order); localStorage.setItem(LS_ORDERS, JSON.stringify(orders));
+        alert('Order sent to Telegram! Order ID: '+id);
+        // clear cart
+        cart = []; saveCart(); renderCart();
+        // update history UI
+        renderHistory();
+      }catch(err){
+        console.error('Order send failed', err);
+        // fallback: copy text summary to clipboard and instruct manual send
+        const { text: fallbackText } = buildOrderTextFallback(order);
+        try{ await navigator.clipboard.writeText(fallbackText); alert('Could not send via Telegram due to browser restrictions. Order copied to clipboard for manual send.'); }catch(e){ alert('Could not send order and could not copy to clipboard. Check console'); }
+      }
+      checkoutBtn.disabled = false; checkoutBtn.textContent = 'Checkout & Send to Telegram';
+    });
+
+    function buildOrderTextFallback(order){ const ph = new Date(order.timestampISO); let text = `Order ID: ${order.id}\nName: ${order.profile.last}, ${order.profile.first} ${order.profile.middle || ''}\nGrade/Section: ${order.profile.grade} - ${order.profile.section}\nDate/Time: ${formatPHDate(ph)} (GMT+8)\n\nItems:\n`; let total=0; for(const it of order.items){ text += `- ${it.title} x${it.qty} = ₱${(it.price*it.qty).toFixed(2)}\n`; total += it.price*it.qty; } text += `\nTotal: ₱${total.toFixed(2)}\n\nVisit: ${SHOP_BASE}\nOrder ID: ${order.id}`; return { text, total }; }
+
+    // ---------- ORDER HISTORY UI ----------
+    document.getElementById('openHistoryBtn').addEventListener('click', ()=>{ historyModal.style.display = 'grid'; renderHistory(); });
+    document.getElementById('closeHistoryBtn').addEventListener('click', ()=>{ historyModal.style.display = 'none'; });
+    document.getElementById('clearHistoryBtn').addEventListener('click', ()=>{ if(!confirm('Are you sure? This will delete all saved orders.')) return; orders = []; localStorage.removeItem(LS_ORDERS); renderHistory(); alert('Order history cleared'); });
+    document.getElementById('exportBtn').addEventListener('click', ()=>{ exportHistory(); });
+
+    function renderHistory(){ const list = document.getElementById('historyList'); list.innerHTML = ''; if(orders.length===0){ list.innerHTML = '<div class="small">No orders yet</div>'; return; } orders.forEach(o=>{ const el = document.createElement('div'); el.className='history-item'; const time = formatPHDate(new Date(o.timestampISO)); let html = `<div style="display:flex;justify-content:space-between;align-items:center"><div style=\"font-weight:800\">${o.id}</div><div class=\"small\">₱${o.total.toFixed(2)} • ${time}</div></div><div class=\"small\">${o.profile.last}, ${o.profile.first} • ${o.profile.grade} - ${o.profile.section}</div><details style=\"margin-top:8px\"><summary class=\"small\">View items</summary><div style=\"margin-top:8px\">`; o.items.forEach(it=>{ html += `<div class=\"small\">- ${it.title} x${it.qty} = ₱${(it.price*it.qty).toFixed(2)}</div>`; }); html += `</div></details>`; el.innerHTML = html; list.appendChild(el); }); }
+
+    function exportHistory(){ if(orders.length===0){ alert('No orders to export'); return; } const ph = getPhilippinesNow(); const dateStr = `${ph.getFullYear()}${String(ph.getMonth()+1).padStart(2,'0')}${String(ph.getDate()).padStart(2,'0')}`; const filename = `orders-${dateStr}.txt`; let txt = ''; orders.forEach(o=>{ const time = formatPHDate(new Date(o.timestampISO)); txt += `Order ID: ${o.id}\nName: ${o.profile.last}, ${o.profile.first} ${o.profile.middle || ''}\nGrade/Section: ${o.profile.grade} - ${o.profile.section}\nDate/Time: ${time} (GMT+8)\nItems:\n`; o.items.forEach(it=>{ txt += ` - ${it.title} x${it.qty} = ₱${(it.price*it.qty).toFixed(2)}\n`; }); txt += `Total: ₱${o.total.toFixed(2)}\n----------------------------------------\n\n`; }); const blob = new Blob([txt], { type: 'text/plain' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+    // ---------- HELPERS ----------
+    function nextOrderId(){ const ph = getPhilippinesNow(); const dateKey = `${ph.getFullYear()}${String(ph.getMonth()+1).padStart(2,'0')}${String(ph.getDate()).padStart(2,'0')}`; orderSeq = JSON.parse(localStorage.getItem(LS_ORDER_SEQ) || '{}'); const n = Number(orderSeq[dateKey] || 0) + 1; orderSeq[dateKey] = n; localStorage.setItem(LS_ORDER_SEQ, JSON.stringify(orderSeq)); const idx = String(n).padStart(3,'0'); return `ORD-${dateKey}-${idx}`; }
+
+    function getPhilippinesNow(){ const now = new Date(); const utc = now.getTime() + (now.getTimezoneOffset()*60000); const ph = new Date(utc + (3600000*8)); return ph; }
+    function formatPHDate(d){ const yyyy = d.getFullYear(); const mm = String(d.getMonth()+1).padStart(2,'0'); const dd = String(d.getDate()).padStart(2,'0'); const hh = String(d.getHours()).padStart(2,'0'); const min = String(d.getMinutes()).padStart(2,'0'); return `${yyyy}-${mm}-${dd} ${hh}:${min}`; }
+
+    function emojiFor(title){ const t=title.toLowerCase(); if(t.includes('waffle')||t.includes('cake')||t.includes('ice cream')) return '🥞'; if(t.includes('burger')||t.includes('beef')) return '🍔'; if(t.includes('coffee')||t.includes('iced')||t.includes('shake')) return '🥤'; if(t.includes('fries')) return '🍟'; return '📦'; }
+
+    function slugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+    // ---------- PROFILE & HISTORY EVENTS ----------
+    document.getElementById('openProfileBtn').addEventListener('click', ()=> openProfileModal());
+    document.getElementById('saveProfileBtn').addEventListener('click', ()=> saveProfile());
+    document.getElementById('closeProfileBtn').addEventListener('click', ()=> closeProfileModal());
+
+    document.getElementById('openHistoryBtn').addEventListener('click', ()=>{ historyModal.style.display='grid'; renderHistory(); });
+
+    document.getElementById('clearCartBtn').addEventListener('click', ()=>{ if(!confirm('Clear cart?')) return; cart=[]; saveCart(); renderCart(); });
+
+    // search & filters
+    searchInput.addEventListener('input', (e)=> { renderProducts(); });
+    foodFilter.addEventListener('change', ()=> renderProducts());
+
+    // rendering initial state
+    renderProducts(); renderCart(); updateProfileDisplay(); renderHistory();
+
+    // expose debug
+    window._market = { PRODUCTS, cart, profile, orders };
+  </script>
 </body>
 </html>
